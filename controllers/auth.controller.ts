@@ -1,5 +1,5 @@
 import { verifyToken } from "@/lib/auth";
-import { registerUser, loginUser, getProfile, verifyEmail } from "@/services/auth.service";
+import { registerUser, loginUser, getProfile, verifyEmail, forgotPassword, resetPassword } from "@/services/auth.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export const register = async(req:NextRequest) => {
@@ -23,11 +23,12 @@ export const register = async(req:NextRequest) => {
 export const login = async (req: NextRequest) => {
     try {
         const {email, password} = await req.json()
-        const user = await loginUser(email, password)
+        const {user, token} = await loginUser(email, password)
         return NextResponse.json({
             success: true,
             message: "Login Successfull",
             user,
+            token,
         }, {status: 200})
     } catch (err: any) {
         return NextResponse.json({
@@ -67,12 +68,66 @@ export const verifyUserEmail = async (req: NextRequest) => {
         await verifyEmail(token)
         return NextResponse.json({
             success: true,
-            message: "Email Verified Successfully"
+            message: "Email verified successfully. You can return to login page."
         }, {status:200})
     } catch (err:any) {
         return NextResponse.json({
             success: false,
             message: err.message
         },{status: 400})
+    }
+}
+
+export const forgotPasswordController = async (req: NextRequest) => {
+    try {
+        const {email} = await req.json()
+        if (!email) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Email is required.",
+                },
+                {
+                    status: 400,
+                }
+            );
+        }
+        const response = await forgotPassword(email)
+        return NextResponse.json({
+            success: true,
+            message: response.message
+        }, {status: 200})
+    } catch (err: any ) {
+        return NextResponse.json({
+            success: false,
+            message: err.message
+        }, {status:400})
+    }
+}
+
+export const resetPasswordController = async (req: NextRequest) => {
+    try {
+        const {token, password} = await req.json()
+         if (!token || !password) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Token and password are required.",
+                },
+                {
+                    status: 400,
+                }
+            );
+        }
+        const response = await resetPassword(token, password)
+        return NextResponse.json({
+            success: true,
+            message: response.message
+        }, {status: 200})
+    } catch (err: any) {
+        return NextResponse.json({
+            success: false,
+            message: err.message,
+        }, {status:400})
     }
 }
