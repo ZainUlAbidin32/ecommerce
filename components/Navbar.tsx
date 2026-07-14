@@ -1,5 +1,5 @@
 import Image from "next/image";
-import navbarLogo from "../../public/images/logo.png";
+import navbarLogo from "../public/images/logo.png";
 import Link from "next/link";
 import { FaUser } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6";
