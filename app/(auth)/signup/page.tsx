@@ -41,13 +41,13 @@ export default function SignupPage() {
     }
   };
   return (
-    <main className="min-h-screen px-4 flex justify-center md:py-5 md:items-center md:bg-linear-to-br md:from-amber-50 md:via-orange-50 md:to-yellow-100">
-      <div className="flex flex-col justify-center items-center md:py-4 md:bg-white md:w-[70%] lg:w-[40%] md:px-4 md:rounded-2xl md:shadow-2xl">
-        <div className="flex flex-col items-start md:w-full md:items-center">
-        <h2 className="font-bold text-3xl">Sign Up</h2>
+    <main className="max-h-screen flex items-center justify-center px-4 py-6 bg-linear-to-br from-amber-50 via-orange-50 to-yellow-100">
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl px-6 py-8">
+        <div className="flex flex-col items-center text-center mb-8">
+        <h2 className="text-3xl font-bold">Sign Up</h2>
         <p className="text-gray-700 text-lg">Hello there, sign up to continue.</p>
       </div>
-      <form onSubmit={handleSubmit} action="" className="pt-10 flex flex-col gap-10 md:w-full">
+      <form onSubmit={handleSubmit} action="" className="w-full pt-8 flex flex-col gap-8">
         <div className="relative">
           <label
             htmlFor="name"
@@ -109,7 +109,7 @@ export default function SignupPage() {
           </>
         ): "Continue"}</button>
       </form>
-      <div className="pt-4 flex justify-start lg:w-full lg:justify-center">
+      <div className="pt-6 text-center">
         <p className="font-semibold">Already have an account?{" "}
         <Link href="/login" className="text-amber-600">Login?</Link></p>
       </div>
