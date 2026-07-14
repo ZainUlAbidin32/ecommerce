@@ -41,7 +41,7 @@ export default function SignupPage() {
     }
   };
   return (
-    <main className="max-h-screen flex items-center justify-center px-4 py-6 bg-linear-to-br from-amber-50 via-orange-50 to-yellow-100">
+    <main className="h-screen flex items-center justify-center px-4 py-6 bg-linear-to-br from-amber-50 via-orange-50 to-yellow-100">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl px-6 py-8">
         <div className="flex flex-col items-center text-center mb-8">
         <h2 className="text-3xl font-bold">Sign Up</h2>
