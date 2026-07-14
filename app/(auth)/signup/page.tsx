@@ -44,8 +44,8 @@ export default function SignupPage() {
     <main className="h-screen flex items-center justify-center px-4 py-6 bg-linear-to-br from-amber-50 via-orange-50 to-yellow-100">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl px-6 py-8">
         <div className="flex flex-col items-center text-center mb-8">
-        <h2 className="text-3xl font-bold">Sign Up</h2>
-        <p className="text-gray-700 text-lg">Hello there, sign up to continue.</p>
+        <h2 className="text-3xl font-bold text-gray-900">Sign Up</h2>
+        <p className="text-gray-600 text-lg">Hello there, sign up to continue.</p>
       </div>
       <form onSubmit={handleSubmit} action="" className="w-full pt-8 flex flex-col gap-8">
         <div className="relative">
@@ -59,7 +59,7 @@ export default function SignupPage() {
             id="name"
             type="text"
             name="name"
-            className="w-full rounded-4xl border-2 border-gray-400 py-3 pl-4 pr-12 outline-none focus:border-green-600"
+            className="w-full rounded-4xl border-2 border-gray-400 py-3 pl-4 pr-12 outline-none focus:border-green-600 text-gray-900 placeholder:text-gray-500"
             placeholder="Enter Your Name"
             onChange={handleChange}
             value={formData.name}
@@ -77,7 +77,7 @@ export default function SignupPage() {
             id="email"
             type="email"
             name="email"
-            className="w-full rounded-4xl border-2 border-gray-400 py-3 pl-4 pr-12 outline-none focus:border-green-600"
+            className="w-full rounded-4xl border-2 border-gray-400 py-3 pl-4 pr-12 outline-none focus:border-green-600 text-gray-900 placeholder:text-gray-500"
             placeholder="Enter Your Email"
             onChange={handleChange}
             value={formData.email}
@@ -95,7 +95,7 @@ export default function SignupPage() {
             id="password"
             type="password"
             name="password"
-            className="w-full rounded-4xl border-2 border-gray-400 py-3 pl-4 pr-12 outline-none focus:border-green-600"
+            className="w-full rounded-4xl border-2 border-gray-400 py-3 pl-4 pr-12 outline-none focus:border-green-600 text-gray-900 placeholder:text-gray-500"
             placeholder="Enter Your Password"
             onChange={handleChange}
             value={formData.password}
@@ -110,8 +110,8 @@ export default function SignupPage() {
         ): "Continue"}</button>
       </form>
       <div className="pt-6 text-center">
-        <p className="font-semibold">Already have an account?{" "}
-        <Link href="/login" className="text-amber-600">Login?</Link></p>
+        <p className="font-semibold text-gray-700">Already have an account?{" "}
+        <Link href="/login" className="text-amber-600 hover:text-amber-700">Login?</Link></p>
       </div>
       </div>
     </main>
