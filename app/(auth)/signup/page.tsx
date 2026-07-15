@@ -33,7 +33,7 @@ export default function SignupPage() {
         email: "",
         password: ""
       })
-      router.push("/login")
+      router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`)
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Something went wrong")
     } finally{
@@ -47,7 +47,7 @@ export default function SignupPage() {
         <h2 className="text-3xl font-bold text-gray-900">Sign Up</h2>
         <p className="text-gray-600 text-lg">Hello there, sign up to continue.</p>
       </div>
-      <form onSubmit={handleSubmit} action="" className="w-full pt-8 flex flex-col gap-8">
+      <form onSubmit={handleSubmit} action="" className="w-full flex flex-col gap-8">
         <div className="relative">
           <label
             htmlFor="name"

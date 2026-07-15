@@ -1,5 +1,5 @@
 import { verifyToken } from "@/lib/auth";
-import { registerUser, loginUser, getProfile, verifyEmail, forgotPassword, resetPassword } from "@/services/auth.service";
+import { registerUser, loginUser, getProfile, verifyOTP, resendOTP, forgotPassword, resetPassword } from "@/services/auth.service";
 import { NextRequest, NextResponse } from "next/server";
 
 export const register = async(req:NextRequest) => {
@@ -59,24 +59,51 @@ export const profile = async (req: NextRequest) => {
     }
 }
 
-export const verifyUserEmail = async (req: NextRequest) => {
+export const verifyOTPController = async (req: NextRequest) => {
     try {
-        const token = req.nextUrl.searchParams.get("token")
-        if (!token) {
-            throw new Error ("Verification Token is missing")
-        } 
-        await verifyEmail(token)
-        return NextResponse.json({
-            success: true,
-            message: "Email verified successfully. You can return to login page."
-        }, {status:200})
-    } catch (err:any) {
-        return NextResponse.json({
-            success: false,
-            message: err.message
-        },{status: 400})
+        const { email, otp } = await req.json();
+        if (!email || !otp) {
+            throw new Error("Email and OTP are required");
+        }
+        await verifyOTP(email, otp);
+        return NextResponse.json(
+            {
+                success: true,
+                message: "Email verified successfully",
+            },{status: 200});
+    } catch (err: any) {
+        return NextResponse.json(
+            {
+                success: false,
+                message: err.message,
+            },{status: 400});
     }
-}
+};
+
+
+export const resendOTPController = async (req: NextRequest) => {
+    try {
+        const { email } = await req.json();
+        if (!email) {
+            throw new Error("Email is required");
+        }
+        const response = await resendOTP(email);
+        return NextResponse.json(
+            {
+                success: true,
+                message: response.message,
+            },{status: 200}
+        );
+    } catch (err: any) {
+        return NextResponse.json(
+            {
+                success: false,
+                message: err.message,
+            },{status: 400}
+        );
+    }
+};
+
 
 export const forgotPasswordController = async (req: NextRequest) => {
     try {

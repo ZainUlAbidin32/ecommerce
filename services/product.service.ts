@@ -30,10 +30,59 @@ export const createProduct = async(
     return product
 }
 
-export const getProducts = async() => {
+export const getProducts = async(
+    search: string,
+    category: string,
+    minPrice: string,
+    maxPrice: string,
+    featured: string,
+    page: number,
+    limit: number
+) => {
     await connectDB()
-    const products = await Product.find().populate("category").sort({createdAt:-1})
-    return products
+    const filter: Record<string, unknown> = {};
+    if (search.trim()){
+        filter.$or = [
+            {
+                name: {
+                $regex: search,
+                $options: 'i', 
+            },
+            },
+            {
+                brand: {
+                $regex: search,
+                $options: 'i'    
+                },
+            },
+        ]
+    }
+    if (category.trim()){
+        filter.category= category
+    }
+    if (minPrice || maxPrice){
+        filter.price = {}
+        if (minPrice) {
+            (filter.price as Record<string,number>).$gte= Number(minPrice)
+        } 
+        if (maxPrice) {
+            (filter.price as Record<string,number>).$lte= Number(maxPrice)
+        } 
+    }
+    if (featured){
+        filter.featured = featured === "true"
+    }
+    const skip = (page - 1) * limit
+
+    const products = await Product.find(filter).populate("category").sort({createdAt:-1}).skip(skip).limit(limit)
+    const totalProducts = await Product.countDocuments(filter)
+    const totalPages = Math.ceil(totalProducts/limit)
+    return {
+        products,
+        currentPage: page,
+        totalProducts,
+        totalPages
+    }
 }
 
 export const updateProduct = async(
@@ -52,7 +101,7 @@ export const updateProduct = async(
     if(!product){
         throw new Error("Product not found")
     }
-    const existingCategory = await Product.findById(category)
+    const existingCategory = await Category.findById(category)
     if(!existingCategory){
         throw new Error("Category not found")
     }
@@ -80,4 +129,13 @@ export const deleteProduct = async(id:string) => {
     return {
         message: "Product deleted Successfully."
     }
+}
+
+export const getProductById = async(id:string) => {
+    await connectDB()
+    const product = await Product.findById(id).populate("category")
+    if(!product){
+        throw new Error('Product not found.')
+    }
+    return product
 }

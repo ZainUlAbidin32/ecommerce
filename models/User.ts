@@ -1,47 +1,47 @@
-import mongoose, {Schema, Document, models, model} from "mongoose";
+import mongoose, { Schema, Document, models, model } from "mongoose";
 
 export interface IUser extends Document {
-    name: string;
-    email: string;
-    password: string;
-    isVerified: boolean;
-    verificationToken?: string,
-    verificationTokenExpiry?: Date,
-    resetPasswordToken?: string,
-    resetPasswordTokenExpiry?: Date, 
+  name: string;
+  email: string;
+  password: string;
+  isVerified: boolean;
+  verificationOTP?: string;
+  verificationOTPExpiry?: Date;
+  resetPasswordToken?: string;
+  resetPasswordTokenExpiry?: Date;
 }
 
 const userSchema = new Schema<IUser>({
-    name: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    isVerified: {
-        type: Boolean,
-        default: false,
-    },
-    verificationToken: {
-        type: String,
-    },
-    verificationTokenExpiry: {
-        type: Date,
-    },
-    resetPasswordToken: {
-        type: String,
-    },
-    resetPasswordTokenExpiry: {
-        type: Date,
-    }
-})
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationOTP: {
+    type: String,
+  },
+  verificationOTPExpiry: {
+    type: Date,
+  },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordTokenExpiry: {
+    type: Date,
+  },
+});
 
-const User =  models.User || model<IUser>("User",userSchema);
+const User = models.User || model<IUser>("User", userSchema);
 export default User;

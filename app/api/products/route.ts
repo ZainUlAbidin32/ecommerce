@@ -5,6 +5,6 @@ export async function POST(req: NextRequest){
     return createProductController(req)
 }
 
-export async function GET(){
-    return getProductsController()
+export async function GET(req: NextRequest){
+    return getProductsController(req)
 }
