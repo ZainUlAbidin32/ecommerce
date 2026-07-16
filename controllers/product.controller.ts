@@ -82,24 +82,23 @@ export const updateProductController = async(
     id: string,
 ) => {
     try {
-        const {
-            name,
-            description,
-            price,
-            stock,
-            brand,
-            featured,
-            images,
-            category
-    } = await req.json()
+        const formData = await req.formData();
+        const name = formData.get("name") as string;
+        const description = formData.get("description") as string;
+        const price = Number(formData.get("price"));
+        const stock = Number(formData.get("stock"));
+        const brand = formData.get("brand") as string;
+        const featured = formData.get("featured") === "true";
+        const category = formData.get("category") as string;
+
+const files = formData.getAll("images") as File[];
     if (
             !name?.trim() ||
             !description?.trim() ||
-            price === undefined ||
-            stock === undefined ||
             !brand?.trim() ||
-            !Array.isArray(images) ||
-            images.length === 0 ||
+            Number.isNaN(price) ||
+            Number.isNaN(stock) ||
+            files.length === 0 ||
             !category
         ) {
             return NextResponse.json(
@@ -108,15 +107,18 @@ export const updateProductController = async(
                     message: "All fields are required.",
                 }, {status: 400});
         }
+        const imageUrls = await Promise.all(
+            files.map((file)=>uploadImage(file))
+        )
         const product = await updateProduct(
             id,
             name.trim(),
             description.trim(),
-            Number(price),
-            Number(stock),
+            price,
+            stock,
             brand.trim(),
-            featured ?? false,
-            images,
+            featured,
+            imageUrls,
             category
         )
         return NextResponse.json({
