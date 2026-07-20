@@ -98,7 +98,6 @@ const files = formData.getAll("images") as File[];
             !brand?.trim() ||
             Number.isNaN(price) ||
             Number.isNaN(stock) ||
-            files.length === 0 ||
             !category
         ) {
             return NextResponse.json(
@@ -107,9 +106,12 @@ const files = formData.getAll("images") as File[];
                     message: "All fields are required.",
                 }, {status: 400});
         }
-        const imageUrls = await Promise.all(
+        let imageUrls: string[] | undefined
+        if (files.length > 0) {
+            imageUrls = await Promise.all(
             files.map((file)=>uploadImage(file))
         )
+        }
         const product = await updateProduct(
             id,
             name.trim(),
@@ -118,8 +120,8 @@ const files = formData.getAll("images") as File[];
             stock,
             brand.trim(),
             featured,
-            imageUrls,
-            category
+            category,
+            imageUrls
         )
         return NextResponse.json({
             success: true,

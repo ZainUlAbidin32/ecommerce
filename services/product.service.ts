@@ -58,7 +58,10 @@ export const getProducts = async(
         ]
     }
     if (category.trim()){
-        filter.category= category
+        const categoryIds = category.split(',')
+        filter.category= {
+            $in: categoryIds
+        }
     }
     if (minPrice || maxPrice){
         filter.price = {}
@@ -93,8 +96,8 @@ export const updateProduct = async(
     stock: number,
     brand: string,
     featured: boolean,
-    images: string[],
-    category: string
+    category: string,
+    images?: string[]
 ) => {
     await connectDB()
     const product = await Product.findById(id)
@@ -112,7 +115,9 @@ export const updateProduct = async(
     product.stock = stock;
     product.brand = brand;
     product.featured = featured;
-    product.images = images;
+    if(images){
+        product.images=images
+    }
     product.category = category;
     await product.save()
     return product

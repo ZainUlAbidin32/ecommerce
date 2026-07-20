@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/db";
 import Category from "@/models/Category";
+import Product from "@/models/Product";
 import { NextResponse } from "next/server";
 
 export const createCategory = async (name: string) => {
@@ -17,7 +18,19 @@ export const createCategory = async (name: string) => {
 export const getCategories = async() => {
     await connectDB()
     const categories = await Category.find().select("-__v").sort({createdAt: -1})
-    return categories
+     const categoriesWithCount = await Promise.all(
+        categories.map(async (category) => {
+            const productCount = await Product.countDocuments({
+                category: category._id,
+            });
+
+            return {
+                ...category.toObject(),
+                productCount,
+            };
+        })
+    );
+    return categoriesWithCount
 }
 
 export const updateCategory = async (
