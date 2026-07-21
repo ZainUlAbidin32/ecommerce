@@ -64,7 +64,8 @@ export const getProductsController = async(req: NextRequest) => {
         const featured = req.nextUrl.searchParams.get("featured") || "";
         const page = Number(req.nextUrl.searchParams.get("page")) || 1;
         const limit = Number(req.nextUrl.searchParams.get("limit")) || 8;
-        const result = await getProducts(search, category, minPrice, maxPrice, featured, page, limit)
+        const sort = req.nextUrl.searchParams.get("sort") || "newest";
+        const result = await getProducts(search, category, minPrice, maxPrice, featured, page, limit, sort)
         return NextResponse.json({
             success: true,
             ...result, 

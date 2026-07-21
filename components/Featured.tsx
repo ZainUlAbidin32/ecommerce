@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
 import ProductCard from "./ProductCard";
 import { Product } from "@/types/product";
+import Link from "next/link";
 
 export default function Featured() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -11,7 +12,7 @@ export default function Featured() {
 
   const getFeaturedProducts = async (): Promise<void> => {
     try {
-      const response = await axiosInstance.get("/products?featured=true");
+      const response = await axiosInstance.get("/products?featured=true&limit=8");
       setFeaturedProducts(response.data.products);
     } catch (error) {
       console.error("Failed to fetch featured products:", error);
@@ -45,26 +46,18 @@ export default function Featured() {
       {/* Products */}
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, index) => (
+          {[...Array(8)].map((_, index) => (
             <div
               key={index}
               className="animate-pulse overflow-hidden rounded-2xl bg-white shadow-sm"
             >
-              {/* Image */}
               <div className="h-64 w-full bg-gray-200" />
 
               <div className="p-5">
-                {/* Brand */}
                 <div className="h-4 w-20 rounded bg-gray-200" />
-
-                {/* Product Name */}
                 <div className="mt-4 h-6 w-3/4 rounded bg-gray-200" />
-
-                {/* Description */}
                 <div className="mt-3 h-4 w-full rounded bg-gray-200" />
                 <div className="mt-2 h-4 w-2/3 rounded bg-gray-200" />
-
-                {/* Price */}
                 <div className="mt-6 h-8 w-28 rounded bg-gray-200" />
               </div>
             </div>
@@ -77,6 +70,7 @@ export default function Featured() {
           ))}
         </div>
       )}
+      {/* View All Featured Products */} <div className="flex justify-center"> <Link href="/products?featured=true" className="rounded-xl bg-slate-900 px-8 py-3 font-semibold text-white transition hover:bg-yellow-600" > View All Featured Products </Link> </div> 
       </div>
     </section>
   );
