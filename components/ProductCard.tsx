@@ -1,16 +1,45 @@
+"use client";
+
 import { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { FaBolt } from "react-icons/fa";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
+import { toast } from "sonner";
+import { useCart } from "@/context/CartContext";
 
 export interface productCardProps {
   product: Product;
 }
+
 export default function ProductCard({ product }: productCardProps) {
+  const {addToCart} = useCart()
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const handleAddToCart = async () => {
+  try {
+    setAddingToCart(true);
+    await addToCart(product._id, 1);
+    setAddedToCart(true);
+    toast.success("Product added to cart");
+    setTimeout(() => {
+      setAddedToCart(false);
+    }, 2000);
+  } catch (error: any) {
+    console.error("Failed to add product to cart:", error);
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to add product to cart. Please try again.",
+    );
+  } finally {
+    setAddingToCart(false);
+  }
+};
+
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <Link href={`/products/${product._id}`}>
           <Image
@@ -21,12 +50,12 @@ export default function ProductCard({ product }: productCardProps) {
           />
         </Link>
 
-        <span className="absolute top-5 left-3 uppercase rounded-full bg-yellow-600 px-3 py-1 text-xs font-semibold text-white shadow">
+        <span className="absolute top-5 left-3 rounded-full bg-yellow-600 px-3 py-1 text-xs font-semibold uppercase text-white shadow">
           {product.brand}
         </span>
 
         <button
-          className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-700 shadow backdrop-blur transition hover:bg-yellow-600 hover:text-white cursor-pointer"
+          className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow backdrop-blur transition hover:bg-yellow-600 hover:text-white"
           aria-label="Add to Wishlist"
         >
           <FiHeart size={18} />
@@ -50,6 +79,7 @@ export default function ProductCard({ product }: productCardProps) {
 
         <div className="mt-auto">
           <hr className="mb-4 border-gray-200" />
+
           <div className="mb-4 flex items-center justify-between">
             <p className="text-2xl font-bold text-yellow-600">
               ${product.price.toFixed(2)}
@@ -67,9 +97,22 @@ export default function ProductCard({ product }: productCardProps) {
               </div>
             )}
           </div>
-          <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3 font-medium text-white transition hover:bg-yellow-600 cursor-pointer">
-            <FiShoppingCart />
-            Add to Cart
+
+          <button
+            onClick={handleAddToCart}
+            disabled={product.stock <= 0 || addingToCart}
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black py-3 font-medium text-white transition hover:bg-yellow-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {addingToCart ? (
+              "Adding..."
+            ) : addedToCart ? (
+              "Added to Cart ✓"
+            ) : (
+              <>
+                <FiShoppingCart />
+                Add to Cart
+              </>
+            )}
           </button>
         </div>
       </div>

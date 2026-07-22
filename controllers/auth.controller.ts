@@ -1,4 +1,5 @@
 import { verifyToken } from "@/lib/auth";
+import { authenticateUser } from "@/lib/authMiddleware";
 import { registerUser, loginUser, getProfile, verifyOTP, resendOTP, forgotPassword, resetPassword } from "@/services/auth.service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -40,13 +41,8 @@ export const login = async (req: NextRequest) => {
 
 export const profile = async (req: NextRequest) => {
     try {
-        const authHeader = await req.headers.get("authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")){
-            throw new Error ("Unauthorized")
-        }
-        const token = authHeader.split(" ")[1]
-        const decoded = verifyToken(token)
-        const user = await getProfile(decoded.userId)
+        const userId = authenticateUser(req);
+        const user = await getProfile(userId); 
         return NextResponse.json({
             success: true,
             user,

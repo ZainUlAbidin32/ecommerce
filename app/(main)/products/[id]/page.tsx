@@ -9,8 +9,11 @@ import { FaBolt } from "react-icons/fa";
 import axiosInstance from "@/lib/axios";
 import { Product } from "@/types/product";
 import RelatedProducts from "@/components/RelatedProducts";
+import { toast } from "sonner";
+import { useCart } from "@/context/CartContext";
 
 export default function ProductDetailsPage() {
+  const { addToCart } = useCart();
   const params = useParams();
   const id = params.id as string;
 
@@ -19,6 +22,8 @@ export default function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [error, setError] = useState("");
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const getProduct = async () => {
     try {
@@ -50,6 +55,34 @@ export default function ProductDetailsPage() {
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity((prev) => prev - 1);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!product || product.stock <= 0) {
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+
+      await addToCart(product._id, quantity);
+
+      setAddedToCart(true);
+      toast.success("Product added to cart");
+
+      setTimeout(() => {
+        setAddedToCart(false);
+      }, 2000);
+    } catch (error: any) {
+      console.error("Failed to add product to cart:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add product to cart. Please try again.",
+      );
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -247,9 +280,21 @@ export default function ProductDetailsPage() {
 
                   {/* Actions */}
                   <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                    <button className="flex flex-1 items-center justify-center gap-3 rounded-xl bg-black px-6 py-4 font-semibold text-white transition hover:bg-yellow-600 cursor-pointer">
-                      <FiShoppingCart size={20} />
-                      Add to Cart
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={addingToCart}
+                      className="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-xl bg-black px-6 py-4 font-semibold text-white transition hover:bg-yellow-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {addingToCart ? (
+                        "Adding..."
+                      ) : addedToCart ? (
+                        "Added to Cart ✓"
+                      ) : (
+                        <>
+                          <FiShoppingCart size={20} />
+                          Add to Cart
+                        </>
+                      )}
                     </button>
 
                     <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-600 px-6 py-4 font-semibold text-white transition hover:bg-yellow-700 cursor-pointer">
