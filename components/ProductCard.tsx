@@ -8,35 +8,88 @@ import { FaBolt } from "react-icons/fa";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 export interface productCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: productCardProps) {
-  const {addToCart} = useCart()
+  const { addToCart } = useCart();
+
+  const {
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+  } = useWishlist();
+
   const [addingToCart, setAddingToCart] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [updatingWishlist, setUpdatingWishlist] = useState(false);
+
+  const wishlisted = isInWishlist(product._id);
 
   const handleAddToCart = async () => {
-  try {
-    setAddingToCart(true);
-    await addToCart(product._id, 1);
-    setAddedToCart(true);
-    toast.success("Product added to cart");
-    setTimeout(() => {
-      setAddedToCart(false);
-    }, 2000);
-  } catch (error: any) {
-    console.error("Failed to add product to cart:", error);
-    toast.error(
-      error.response?.data?.message ||
-        "Failed to add product to cart. Please try again.",
-    );
-  } finally {
-    setAddingToCart(false);
-  }
-};
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+
+      await addToCart(product._id, 1);
+
+      setAddedToCart(true);
+
+      toast.success("Product added to cart");
+
+      setTimeout(() => {
+        setAddedToCart(false);
+      }, 2000);
+    } catch (error: any) {
+      console.error("Failed to add product to cart:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add product to cart. Please try again.",
+      );
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleWishlist = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      setUpdatingWishlist(true);
+
+      if (wishlisted) {
+        await removeFromWishlist(product._id);
+        toast.success("Product removed from wishlist");
+      } else {
+        await addToWishlist(product._id);
+        toast.success("Product added to wishlist");
+      }
+    } catch (error: any) {
+      console.error("Failed to update wishlist:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update wishlist. Please try again.",
+      );
+    } finally {
+      setUpdatingWishlist(false);
+    }
+  };
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -55,10 +108,23 @@ export default function ProductCard({ product }: productCardProps) {
         </span>
 
         <button
-          className="absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/90 text-gray-700 shadow backdrop-blur transition hover:bg-yellow-600 hover:text-white"
-          aria-label="Add to Wishlist"
+          onClick={handleWishlist}
+          disabled={updatingWishlist}
+          className={`absolute top-3 right-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow backdrop-blur transition ${
+            wishlisted
+              ? "text-red-500"
+              : "text-gray-700 hover:bg-yellow-600 hover:text-white"
+          } disabled:cursor-not-allowed disabled:opacity-50`}
+          aria-label={
+            wishlisted
+              ? "Remove from Wishlist"
+              : "Add to Wishlist"
+          }
         >
-          <FiHeart size={18} />
+          <FiHeart
+            size={18}
+            className={wishlisted ? "fill-current" : ""}
+          />
         </button>
       </div>
 

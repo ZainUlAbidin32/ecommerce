@@ -9,6 +9,7 @@ export interface IUser extends Document {
   verificationOTPExpiry?: Date;
   resetPasswordToken?: string;
   resetPasswordTokenExpiry?: Date;
+  role: "user" | "admin";
 }
 
 const userSchema = new Schema<IUser>({
@@ -41,6 +42,11 @@ const userSchema = new Schema<IUser>({
   resetPasswordTokenExpiry: {
     type: Date,
   },
+  role: {
+  type: String,
+  enum: ["user", "admin"],
+  default: "user",
+},
 });
 
 const User = models.User || model<IUser>("User", userSchema);

@@ -36,6 +36,7 @@ interface CartContextType {
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
+  resetCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -67,10 +68,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart(response.data.cart);
   };
 
-  const updateQuantity = async (
-    productId: string,
-    quantity: number,
-  ) => {
+  const updateQuantity = async (productId: string, quantity: number) => {
     const response = await axiosInstance.patch("/cart", {
       productId,
       quantity,
@@ -102,15 +100,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const resetCart = () => {
+  setCart(null);
+};
+
   useEffect(() => {
-    fetchCart();
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      fetchCart();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const cartCount =
-    cart?.items.reduce(
-      (total, item) => total + item.quantity,
-      0,
-    ) ?? 0;
+    cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
 
   return (
     <CartContext.Provider
@@ -123,6 +128,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         removeFromCart,
         clearCart,
+        resetCart
       }}
     >
       {children}
@@ -134,9 +140,7 @@ export function useCart() {
   const context = useContext(CartContext);
 
   if (!context) {
-    throw new Error(
-      "useCart must be used inside CartProvider",
-    );
+    throw new Error("useCart must be used inside CartProvider");
   }
 
   return context;

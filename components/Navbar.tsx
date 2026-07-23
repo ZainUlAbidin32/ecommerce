@@ -5,10 +5,19 @@ import { FiSearch, FiHeart, FiMenu, FiX } from "react-icons/fi";
 import { FaCartShopping, FaUser } from "react-icons/fa6";
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { cartCount } = useCart();
+  const { cartCount, resetCart } = useCart();
+  const { isLoggedIn, logout, user, loading } = useAuth();
+  const { wishlistCount } = useWishlist();
+  const handleLogout = () => {
+    logout();
+    resetCart();
+    window.location.href = "/";
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-gray-900 text-white shadow-lg">
@@ -35,7 +44,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8 font-semibold">
+          <div className="hidden md:flex items-center gap-4 font-semibold">
             <Link href="/" className="hover:text-yellow-500 transition">
               HOME
             </Link>
@@ -69,62 +78,90 @@ export default function Navbar() {
             </div>
 
             {/* Wishlist - Desktop Only */}
-            <Link
-              href="/wishlist"
-              className="hidden md:flex text-xl hover:text-yellow-500 transition"
-            >
-              <FiHeart />
-            </Link>
+            {!loading && isLoggedIn && (
+              <Link
+                href="/wishlist"
+                className="relative hidden text-xl transition hover:text-yellow-500 md:flex"
+              >
+                <FiHeart />
+                {wishlistCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Profile - Desktop Only */}
             {/* Profile Dropdown */}
-            <div className="relative hidden md:block group">
-              <button className="flex items-center text-xl transition hover:text-yellow-500">
-                <FaUser />
-              </button>
-
-              <div
-                className="
-      invisible absolute right-0 mt-4 w-56
-      rounded-xl bg-white py-2 text-gray-800
-      shadow-2xl opacity-0
-      transition-all duration-200
-      group-hover:visible
-      group-hover:opacity-100
-    "
-              >
-                <Link
-                  href="/profile"
-                  className="block px-5 py-3 hover:bg-gray-100"
-                >
-                  My Account
-                </Link>
-
-                <Link
-                  href="/orders"
-                  className="block px-5 py-3 hover:bg-gray-100"
-                >
-                  Orders
-                </Link>
-
-                {/* Show only for Admin */}
-
-                {/* {user?.role === "admin" && ( */}
-                <Link
-                  href="/admin"
-                  className="block px-5 py-3 text-yellow-600 hover:bg-yellow-50"
-                >
-                  Admin Dashboard
-                </Link>
-                {/* )} */}
-
-                <hr className="my-2" />
-
-                <button className="w-full px-5 py-3 text-left text-red-600 hover:bg-red-50">
-                  Logout
+            {!loading && isLoggedIn && (
+              <div className="relative hidden md:block group">
+                <button className="flex items-center text-xl transition hover:text-yellow-500 cursor-pointer">
+                  <FaUser />
                 </button>
+
+                <div
+                  className="
+        invisible absolute right-0 mt-4 w-56
+        rounded-xl bg-white py-2 text-gray-800
+        shadow-2xl opacity-0
+        transition-all duration-200
+        group-hover:visible
+        group-hover:opacity-100
+      "
+                >
+                  <Link
+                    href="/profile"
+                    className="block px-5 py-3 hover:bg-gray-100"
+                  >
+                    My Account
+                  </Link>
+
+                  <Link
+                    href="/orders"
+                    className="block px-5 py-3 hover:bg-gray-100"
+                  >
+                    Orders
+                  </Link>
+
+                  {user?.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      className="block px-5 py-3 text-yellow-600 hover:bg-yellow-50"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+
+                  <hr className="my-2" />
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-5 py-3 text-left text-red-600 hover:bg-red-50"
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+
+            {!loading && !isLoggedIn && (
+              <div className="hidden md:flex items-center gap-3">
+                <Link
+                  href="/login"
+                  className="rounded-lg px-4 py-2 font-semibold transition hover:text-yellow-500"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-yellow-500 px-4 py-2 font-semibold text-gray-900 transition hover:bg-yellow-400"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
 
             {/* Cart - Always Visible */}
             <Link
@@ -188,50 +225,78 @@ export default function Navbar() {
 
             <hr className="border-gray-700" />
 
-            <Link
-              href="/wishlist"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3"
-            >
-              <FiHeart />
-              Wishlist
-            </Link>
+            {!loading && isLoggedIn ? (
+              <>
+                <Link
+                  href="/wishlist"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <FiHeart />
+                    <span>Wishlist</span>
 
-            <Link
-              href="/profile"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3"
-            >
-              <FaUser />
-              My Account
-            </Link>
+                    {wishlistCount > 0 && (
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </div>
+                </Link>
 
-            <Link
-              href="/orders"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3"
-            >
-              📦 Orders
-            </Link>
+                <Link
+                  href="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
+                  <FaUser />
+                  My Account
+                </Link>
 
-            {/* Show only for Admin */}
+                <Link
+                  href="/orders"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3"
+                >
+                  📦 Orders
+                </Link>
 
-            {/* {user?.role === "admin" && ( */}
-            <Link
-              href="/admin"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 text-yellow-500"
-            >
-              🛠 Admin Dashboard
-            </Link>
-            {/* )} */}
+                {user?.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 text-yellow-500"
+                  >
+                    🛠 Admin Dashboard
+                  </Link>
+                )}
 
-            <button
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 text-left text-red-400"
-            >
-              🚪 Logout
-            </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 text-left text-red-400"
+                >
+                  🚪 Logout
+                </button>
+              </>
+            ) : !loading ? (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3"
+                >
+                  🔑 Login
+                </Link>
+
+                <Link
+                  href="/signup"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 text-yellow-500"
+                >
+                  📝 Sign Up
+                </Link>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

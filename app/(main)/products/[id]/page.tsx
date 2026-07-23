@@ -59,6 +59,12 @@ export default function ProductDetailsPage() {
   };
 
   const handleAddToCart = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
     if (!product || product.stock <= 0) {
       return;
     }

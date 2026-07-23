@@ -8,27 +8,19 @@ import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
 
-interface CartProduct {
-  _id: string;
-  name: string;
-  price: number;
-  images: string[];
-  stock: number;
-}
-
-interface CartItem {
-  product: CartProduct;
-  quantity: number;
-}
-
-interface Cart {
-  user: string;
-  items: CartItem[];
-}
-
 export default function CartPageContent() {
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const { cart, loading, updateQuantity, removeFromCart, clearCart } =
     useCart();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.replace("/login");
+      return;
+    }
+    setCheckingAuth(false);
+  }, []);
   const handleIncrease = async (
     productId: string,
     currentQuantity: number,
@@ -88,6 +80,11 @@ export default function CartPageContent() {
       (total, item) => total + item.product.price * item.quantity,
       0,
     ) ?? 0;
+
+
+  if (checkingAuth) {
+  return null;
+}  
 
   if (loading) {
     return (

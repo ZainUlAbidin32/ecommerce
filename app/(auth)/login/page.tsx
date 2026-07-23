@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import axiosInstance from "@/lib/axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { MdEmail } from "react-icons/md";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  const {login} = useAuth()
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
@@ -25,8 +27,7 @@ export default function LoginPage() {
     try {
       const response = await axiosInstance.post("auth/login", formData);
       const { user, token, message } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      login(user, token);
       toast.success(message);
       router.push("/");
     } catch (err: any) {
